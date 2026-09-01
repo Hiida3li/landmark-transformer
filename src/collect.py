@@ -29,14 +29,14 @@ def main() -> None:
     seq_len = cfg["seq_len"]
     out_dir = Path(cfg["data_dir"]) / args.gesture
     out_dir.mkdir(parents=True, exist_ok=True)
-    session = time.strftime("%Y%m%d_%H%M%S")            # groups this run's samples
+    session = time.strftime("%Y%m%d_%H%M%S")
 
     extractor = HandLandmarkExtractor()
     cap = cv2.VideoCapture(0)
     saved = 0
 
     while saved < args.samples:
-        # --- countdown: give the user time to pose ---
+        # countdown gives the user time to pose
         for remaining in (3, 2, 1):
             t_end = time.time() + 1.0
             while time.time() < t_end:
@@ -49,7 +49,7 @@ def main() -> None:
                 cv2.imshow("Collect", frame)
                 cv2.waitKey(1)
 
-        # --- record seq_len consecutive frames ---
+        # record seq_len consecutive frames
         frames: list[np.ndarray] = []
         dropped = False
         while len(frames) < seq_len:
@@ -58,7 +58,7 @@ def main() -> None:
             lms = extractor.extract(frame)               # (21, 3) or None
             if lms is None:
                 dropped = True
-                break                                    # hand lost -> discard sample
+                break                                    # hand lost - discard sample
             frames.append(lms)
             draw_landmarks(frame, lms)
             cv2.putText(frame, f"REC {len(frames)}/{seq_len}", (10, 70),
