@@ -4,3 +4,4 @@ __pycache__/
 *.npz
 *.pt
 .DS_Store
+models/
