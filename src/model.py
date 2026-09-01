@@ -101,6 +101,5 @@ if __name__ == "__main__":
     logits = model(x)
     print("input:", x.shape, "-> logits:", logits.shape)
 
-    # peek at one attention map
     _, attn = model.blocks[0].attn(model.embed(x) + model.pos, return_attn=True)
     print("attention:", attn.shape, "  row sums:", attn[0, 0].sum(dim=-1)[:3])
