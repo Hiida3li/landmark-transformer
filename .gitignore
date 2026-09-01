@@ -2,6 +2,7 @@
 .env
 .idea/
 
+
 data/
 models/
 
