@@ -12,17 +12,17 @@ from scratch. Everything trains on a CPU/GPU.
 
 Vision Transformers treat an image as a sequence of patch tokens. If the useful signal in a
 gesture is the *configuration of the hand* rather than the pixels around it, then a much
-cheaper tokenisation is available: run a pretrained keypoint detector, and treat each frame's
+cheaper tokenization is available: run a pretrained keypoint detector, and treat each frame's
 21 hand landmarks as a single token.
 
-This trades a 921,600-dimensional input (640x480x3) for a 63-dimensional one — a ~14,000x
-reduction — at the cost of discarding everything the keypoint model does not capture. The
+This trades a 921,600-dimensional input (640x480x3) for a 63-dimensional one, a ~14,000x
+reduction, at the cost of discarding everything the keypoint model does not capture. The
 question this repo investigates is what that trade buys and what it costs.
 
 Concretely:
 
 1. Does a Transformer over landmark sequences classify gestures reliably?
-2. Does attention earn its parameters, compared to a baseline with no temporal modelling?
+2. Does attention earn its parameters, compared to a baseline with no temporal modeling?
 3. What breaks when the model leaves the dataset it was trained on?
 
 ## 2. Method
@@ -54,7 +54,7 @@ p~_i = (p_i - p_0) / || p_9 - p_0 ||
 - **Scaling.** Dividing by the wrist-to-middle-knuckle distance `|| p_9 - p_0 ||` removes
   apparent size, and therefore distance from the camera.
 
-By construction the wrist maps to the origin and the reference length maps to 1. Rotation is
+By construction, the wrist maps to the origin and the reference length maps to 1. Rotation is
 deliberately *not* removed; see [Limitations](#6-limitations).
 
 ### 2.3 Model
@@ -111,15 +111,15 @@ session is held out. This is the central methodological choice in the repo.
 
 Frames within a single recording run are near-duplicates of each other — same lighting, same
 position, same pose, seconds apart. A random per-sample split would place near-identical
-samples on both sides of the boundary, and the resulting accuracy would measure memorisation
-rather than generalisation. Splitting by session makes the validation set a genuinely unseen
+samples on both sides of the boundary, and the resulting accuracy would measure memorization
+rather than generalization. Splitting by session makes the validation set a genuinely unseen
 recording condition.
 
 Resulting split: 200 train / 100 validation, with all five classes present in validation.
 
 ## 4. Results
 
-Identical data, seed, optimiser (AdamW, lr 1e-3, weight decay 1e-2), batch size 32, and 40
+Identical data, seed, optimizer (AdamW, lr 1e-3, weight decay 1e-2), batch size 32, and 40
 epochs for both models.
 
 | Model | Parameters | Best val. accuracy | Epochs to reach 1.000 |
@@ -185,7 +185,7 @@ Note that 0.10.21 requires `numpy<2`, which conflicts with `opencv-python>=5`; u
 - **Closed label set.** The model cannot express "unknown"; every input is forced into one of
   five classes.
 - **Rotation is not normalised.** A tilted gesture yields different features from an upright
-  one. Whether removing rotation helps or hurts is an open question — it would add invariance,
+  one. Whether removing rotation helps or hurts is an open question, it would add invariance,
   but orientation is genuinely informative for some gestures (`thumbs_up` versus
   `thumbs_down`).
 - **No image-based baseline yet.** The "landmarks versus pixels" comparison in the title is
