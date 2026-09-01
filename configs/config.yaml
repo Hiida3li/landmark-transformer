@@ -1,0 +1,10 @@
+seq_len: 30            # frames per sample (~1 second at 30fps)
+n_landmarks: 21
+n_coords: 3
+gestures:
+  - open_palm
+  - fist
+  - peace
+  - thumbs_up
+  - point
+data_dir: data
