@@ -8,7 +8,7 @@ from scratch. Everything trains on a CPU/GPU.
 
 ---
 
-## 1. Motivation
+## 1. Why
 
 Vision Transformers treat an image as a sequence of patch tokens. If the useful signal in a
 gesture is the *configuration of the hand* rather than the pixels around it, then a much
