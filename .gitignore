@@ -1,8 +1,12 @@
 .venv/
+.env
+.idea/
+
 data/
+models/
+
 __pycache__/
 *.npz
 *.pt
+
 .DS_Store
-models/
-/.idea
