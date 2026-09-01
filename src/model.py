@@ -39,7 +39,7 @@ class MultiHeadSelfAttention(nn.Module):
 
         # softmax over the last axis: each row becomes a distribution over tokens
         attn = F.softmax(scores, dim=-1)                # (B, H, T, T)
-        attn = self.drop(attn)
+        attn = self.drop(attn) # some values randomly removed
 
         # weighted sum of values:  (B, H, T, T) @ (B, H, T, dk) -> (B, H, T, dk)
         out = attn @ v
