@@ -127,6 +127,9 @@ epochs for both models.
 | Transformer | 73,413 | **1.000** | 2 |
 | MLP (mean-pooled) | 25,349 | **1.000** | 27 |
 
+![Validation accuracy](results/val_accuracy.png)
+
+
 **Both models saturate the task.** Attention provides no accuracy advantage at 2.9x the
 parameter count. Its only measurable benefit is convergence speed: the Transformer reaches
 100% by epoch 2 and stays there, while the MLP climbs gradually and still oscillates between

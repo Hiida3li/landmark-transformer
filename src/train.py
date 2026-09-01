@@ -2,6 +2,8 @@
 
 import argparse
 import time
+import json
+from pathlib import Path
 
 import torch
 import torch.nn.functional as F
@@ -26,6 +28,9 @@ def evaluate(model, loader, device) -> tuple[float, float]:
 
 
 def main(args) -> None:
+    Path("results").mkdir(exist_ok=True)
+    Path("models").mkdir(exist_ok=True)
+
     cfg = yaml.safe_load(open("configs/config.yaml"))
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     torch.manual_seed(0)
@@ -38,6 +43,7 @@ def main(args) -> None:
     else:
         model = MLPBaseline(n_classes=len(cfg["gestures"])).to(device)
     ckpt_path = f"models/{args.model}_best.pt"
+    history = []
 
     n_params = sum(p.numel() for p in model.parameters())
     print(f"model: {args.model}  parameters: {n_params:,}")
@@ -64,12 +70,18 @@ def main(args) -> None:
         val_loss, val_acc = evaluate(model, val_dl, device)
         print(f"epoch {epoch:3d}  train_loss {train_loss:.4f}  "
               f"val_loss {val_loss:.4f}  val_acc {val_acc:.3f}  ({time.time()-t0:.1f}s)")
+        history.append({"epoch": epoch, "train_loss": train_loss,
+                        "val_loss": val_loss, "val_acc": val_acc})
+
 
         if val_acc > best_acc:
             best_acc = val_acc
             torch.save(model.state_dict(), ckpt_path)
+    with open(f"results/{args.model}_history.json", "w") as f:
+        json.dump(history, f, indent=2)
 
     print(f"best val_acc: {best_acc:.3f}")
+
 
 
 if __name__ == "__main__":
