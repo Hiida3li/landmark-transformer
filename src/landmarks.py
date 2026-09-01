@@ -62,7 +62,7 @@ def draw_landmarks(frame: np.ndarray, landmarks: np.ndarray) -> None:
 
 
 if __name__ == "__main__":
-    # Quick visual test: webcam + skeleton overlay + landmark shape in terminal.
+
     extractor = HandLandmarkExtractor()
     cap = cv2.VideoCapture(0)
     while True:
