@@ -94,6 +94,7 @@ class LandmarkTransformer(nn.Module):
 
 if __name__ == "__main__":
     model = LandmarkTransformer()
+    model.eval()
     n_params = sum(p.numel() for p in model.parameters())
     print(f"parameters: {n_params:,}")
 
@@ -102,4 +103,5 @@ if __name__ == "__main__":
     print("input:", x.shape, "-> logits:", logits.shape)
 
     _, attn = model.blocks[0].attn(model.embed(x) + model.pos, return_attn=True)
+    print("training mode?", model.training, model.blocks[0].attn.drop.training)
     print("attention:", attn.shape, "  row sums:", attn[0, 0].sum(dim=-1)[:3])
