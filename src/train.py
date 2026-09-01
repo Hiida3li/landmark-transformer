@@ -1,11 +1,13 @@
-"""Train the landmark Transformer; save the best checkpoint by validation accuracy."""
+"""Train the landmark Transformer or MLP baseline; save the best checkpoint."""
 
+import argparse
 import time
 
 import torch
 import torch.nn.functional as F
 import yaml
 
+from src.baseline import MLPBaseline
 from src.dataset import make_dataloaders
 from src.model import LandmarkTransformer
 
@@ -23,14 +25,23 @@ def evaluate(model, loader, device) -> tuple[float, float]:
     return total_loss / n, correct / n
 
 
-def main() -> None:
+def main(args) -> None:
     cfg = yaml.safe_load(open("configs/config.yaml"))
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
     torch.manual_seed(0)
 
     train_dl, val_dl = make_dataloaders(cfg, batch_size=32)
-    model = LandmarkTransformer(n_classes=len(cfg["gestures"]),
-                                seq_len=cfg["seq_len"]).to(device)
+
+    if args.model == "transformer":
+        model = LandmarkTransformer(n_classes=len(cfg["gestures"]),
+                                    seq_len=cfg["seq_len"]).to(device)
+    else:
+        model = MLPBaseline(n_classes=len(cfg["gestures"])).to(device)
+    ckpt_path = f"models/{args.model}_best.pt"
+
+    n_params = sum(p.numel() for p in model.parameters())
+    print(f"model: {args.model}  parameters: {n_params:,}")
+
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-2)
 
     epochs, best_acc = 40, 0.0
@@ -44,8 +55,8 @@ def main() -> None:
             loss = F.cross_entropy(logits, yb)              # scalar
 
             optimizer.zero_grad()                           # clear old gradients
-            loss.backward()                                 # chain rule -> dL/dtheta for all theta
-            optimizer.step()                                # theta <- theta - lr * (adapted) grad
+            loss.backward()                                 # chain rule -> dL/dtheta
+            optimizer.step()                                # theta <- theta - lr * grad
 
             running += loss.item() * len(yb)
 
@@ -56,10 +67,15 @@ def main() -> None:
 
         if val_acc > best_acc:
             best_acc = val_acc
-            torch.save(model.state_dict(), "models/transformer_best.pt")
+            torch.save(model.state_dict(), ckpt_path)
 
     print(f"best val_acc: {best_acc:.3f}")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", choices=["transformer", "mlp"], default="transformer")
+    args = parser.parse_args()
+    main(args)
+
+
