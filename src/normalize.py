@@ -8,7 +8,7 @@ where p_0 is the wrist and p_9 is the base of the middle finger.
 import numpy as np
 
 WRIST = 0
-MIDDLE_MCP = 9          # base knuckle of the middle finger
+MIDDLE_MCP = 9
 
 
 def normalize_sequence(seq: np.ndarray) -> np.ndarray:
@@ -19,7 +19,7 @@ def normalize_sequence(seq: np.ndarray) -> np.ndarray:
     centered = seq - wrist                        # (T, 21, 3) - (T, 1, 3) -> (T, 21, 3)
 
     ref = centered[:, MIDDLE_MCP, :]              # (T, 3)   vector wrist -> middle base
-    scale = np.linalg.norm(ref, axis=-1)          # (T,)     its Euclidean length
+    scale = np.linalg.norm(ref, axis=-1)
     scale = scale[:, None, None]                  # (T, 1, 1) for broadcasting
     scale = np.maximum(scale, 1e-6)               # never divide by zero
 
